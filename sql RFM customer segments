@@ -1,0 +1,46 @@
+--- tính rfm và phân  tích 
+WITH rfm AS (
+SELECT
+    CustomerID,
+    DATEDIFF(day, MAX(InvoiceDate),
+    (SELECT MAX(InvoiceDate) FROM online_retail)) AS Recency,
+    COUNT(DISTINCT InvoiceNo) AS Frequency,
+    SUM(Quantity * UnitPrice) AS Monetary
+FROM online_retail
+GROUP BY CustomerID
+)
+
+,ranking_cus as (SELECT *
+,NTILE(5)OVER(ORDER BY Recency DESC)AS r_score
+,NTILE(5)OVER(ORDER BY Frequency DESC)AS f_score
+,NTILE(5)OVER(ORDER BY Monetary DESC)AS m_score
+
+FROM rfm
+) 
+,segment_cus as(SELECT *,
+CASE WHEN R_score >=4 AND F_score >=4 AND M_score >=4 THEN 'Champions'
+WHEN F_score >=4 AND M_score >=4 THEN 'Loyal Customers'
+WHEN R_score >=4 AND F_score <=2 THEN 'New Customers'
+WHEN R_score <=2 AND F_score <=2 THEN 'Lost Customers'
+ELSE 'Regular Customers'
+END AS Segment
+FROM ranking_cus
+)
+SELECT *
+INTO rfm_result
+FROM segment_cus
+--số  lương khách mỗi nhóm
+SELECT Segment, COUNT(*) as number_customers
+FROM rfm_result
+GROUP BY Segment
+-- doanhn thu mỗi nhóm
+SELECT Segment, SUM(Monetary) as revenue
+FROM rfm_result
+GROUP BY Segment
+--- tỷ lệ khach hàng
+SELECT Segment
+,count(*)as number_cus
+,ROUND(count(*)*100.0/SUM(count(*))over(),2)as percentage_cus
+FROM rfm_result
+group by Segment
+ORDER BY number_cus DESC
