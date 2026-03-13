@@ -1,3 +1,9 @@
+DELETE FROM online_retail
+WHERE CustomerID IS NULL;
+DELETE FROM online_retail
+WHERE InvoiceNo LIKE 'C%';
+DELETE FROM online_retail
+WHERE Quantity <= 0;
 --- tính rfm và phân  tích 
 WITH rfm AS (
 SELECT
