@@ -25,9 +25,8 @@ analyst and category customer groups
                       Regular Customers	    Moderate purchase activity
                       Lost Customers        Customers who have not purchased recently
   7,Project Structure
-├── data
-│   └── online_retail.csv
-│
-├── sql
-│   └── rfm_analysis.sql
-└── README.md
+-data
+-online_retail.csv
+-sql
+-rfm_analysis.sql
+-README.md
